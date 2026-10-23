@@ -18,4 +18,162 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  currency  String   @default("USD") @db.Char(3)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships Membership[]
+  brands      Brand[]
+  campaigns   Campaign[]
+}
+
+enum Role {
+  OWNER
+  MANAGER
+  VIEWER
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+model Brand {
+  id         String    @id @default(cuid())
+  name       String
+  website    String?
+  notes      String?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  contacts  Contact[]
+  campaigns Campaign[]
+
+  @@unique([workspaceId, name])
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  title     String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+}
+
+enum CampaignStatus {
+  LEAD
+  NEGOTIATING
+  CONTRACTED
+  IN_PRODUCTION
+  POSTED
+  INVOICED
+  PAID
+  CANCELLED
+}
+
+model Campaign {
+  id        String         @id @default(cuid())
+  title     String
+  status    CampaignStatus @default(LEAD)
+  feeCents  Int?
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Restrict)
+
+  deliverables Deliverable[]
+
+  @@index([workspaceId, status])
+  @@index([brandId])
+}
+
+enum DeliverableType {
+  REEL
+  STORY
+  VIDEO
+  POST
+}
+
+enum Platform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  TWITCH
+  X
+  FACEBOOK
+  LINKEDIN
+  PINTEREST
+  SNAPCHAT
+  THREADS
+  PODCAST
+  NEWSLETTER
+  BLOG
+  OTHER
+}
+
+enum DeliverableStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  CHANGES_REQUESTED
+  APPROVED
+  SCHEDULED
+  POSTED
+  CANCELLED
+}
+
+model Deliverable {
+  id            String            @id @default(cuid())
+  type          DeliverableType
+  platform      Platform
+  status        DeliverableStatus @default(NOT_STARTED)
+  dueDate       DateTime?
+  scheduledFor  DateTime?
+  postedAt      DateTime?
+  liveUrl       String?
+  revisionCount Int               @default(0)
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
 }
