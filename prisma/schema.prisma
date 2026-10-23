@@ -124,10 +124,16 @@ model Campaign {
 }
 
 enum DeliverableType {
+  POST
   REEL
   STORY
+  SHORT
   VIDEO
-  POST
+  INTEGRATION
+  LIVESTREAM
+  AD_READ
+  ARTICLE
+  OTHER
 }
 
 enum Platform {
