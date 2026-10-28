@@ -1,8 +1,6 @@
 import { Suspense } from "react";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { SignOutButton } from "./sign-out-button";
+import { getCurrentMembership } from "@/lib/workspace";
 
 export default function DashboardPage() {
   return (
@@ -17,18 +15,13 @@ export default function DashboardPage() {
 }
 
 async function CurrentUser() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/sign-in");
-  }
+  const membership = await getCurrentMembership();
+  const { workspace } = membership;
 
   return (
     <div className="space-y-4">
       <p>
-        Signed in as <strong>{session.user.name}</strong> ({session.user.email})
+        <strong>{workspace.name}</strong> · your role: {membership.role}
       </p>
       <SignOutButton />
     </div>

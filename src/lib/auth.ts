@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./db";
-import { uniqueSlug } from "./slug";
+import { createPersonalWorkspace } from "./workspace-setup";
+//import { uniqueSlug } from "./slug";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -9,24 +10,16 @@ export const auth = betterAuth({
     enabled: true,
   },
   databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
-          try {
-            await prisma.workspace.create({
-              data: {
-                name: `${user.name}'s Workspace`,
-                slug: uniqueSlug(user.name),
-                memberships: {
-                  create: { userId: user.id, role: "OWNER" },
-                },
-              },
-            });
-          } catch (error) {
-            console.error(`[auth] Failed to create workspace for user ${user.id}:`, error);
-          }
-        },
+  user: {
+    create: {
+      after: async (user) => {
+        try {
+          await createPersonalWorkspace(user);
+        } catch (error) {
+          console.error(`[auth] Failed to create workspace for user ${user.id}:`, error);
+        }
       },
     },
   },
+},
 });
