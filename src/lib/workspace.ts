@@ -17,23 +17,24 @@ export const requireSession = cache(async () => {
   return session;
 });
 export const getCurrentMembership = cache(async () => {
-    const session = await requireSession();
+  const session = await requireSession();
 
-    const membership = await prisma.membership.findFirst({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "asc" },
-        include: { workspace: true },
-    });
+  const membership = await prisma.membership.findFirst({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "asc" },
+    include: { workspace: true },
+  });
 
-    if (membership) {
-        return membership;
-    }
+  if (membership) {
+    return membership;
+  }
 
-    // Self-heal: the sign-up hook failed or was skipped, so create the workspace now
-    console.warn(`[workspace] User ${session.user.id} had no workspace; creating one.`);
-    return createPersonalWorkspace(session.user);
+  // Self-heal: the sign-up hook failed or was skipped, so create the workspace now
+  console.warn(
+    `[workspace] User ${session.user.id} had no workspace; creating one.`,
+  );
+  return createPersonalWorkspace(session.user);
 });
-
 
 export class ForbiddenError extends Error {
   constructor(message = "You don't have permission to do that.") {

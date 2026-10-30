@@ -2,22 +2,23 @@ import { Suspense } from "react";
 import { getCurrentMembership } from "@/lib/workspace";
 import { listCampaigns } from "@/lib/campaigns";
 import { formatMoney } from "@/lib/money";
-import { SignOutButton } from "./sign-out-button";
 
 export default function DashboardPage() {
   return (
-    <main className="mx-auto mt-16 max-w-4xl px-4">
+    <div>
       <Suspense fallback={<p className="text-sm text-gray-500">Loading…</p>}>
         <WorkspaceHeader />
       </Suspense>
 
       <section className="mt-10">
         <h2 className="mb-4 text-lg font-semibold">Campaigns</h2>
-        <Suspense fallback={<p className="text-sm text-gray-500">Loading campaigns…</p>}>
+        <Suspense
+          fallback={<p className="text-sm text-gray-500">Loading campaigns…</p>}
+        >
           <CampaignsTable />
         </Suspense>
       </section>
-    </main>
+    </div>
   );
 }
 
@@ -28,15 +29,20 @@ async function WorkspaceHeader() {
     <header className="flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-semibold">{membership.workspace.name}</h1>
-        <p className="text-sm text-gray-500">Your role: {formatEnum(membership.role)}</p>
+        <p className="text-sm text-gray-500">
+          Your role: {formatEnum(membership.role)}
+        </p>
       </div>
-      <SignOutButton />
+
     </header>
   );
 }
 
 async function CampaignsTable() {
-  const [membership, campaigns] = await Promise.all([getCurrentMembership(), listCampaigns()]);
+  const [membership, campaigns] = await Promise.all([
+    getCurrentMembership(),
+    listCampaigns(),
+  ]);
   const { currency } = membership.workspace;
 
   if (campaigns.length === 0) {
