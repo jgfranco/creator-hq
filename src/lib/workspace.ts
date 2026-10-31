@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "./auth";
 import { prisma } from "./db";
-import { createPersonalWorkspace } from "./workspace-setup";
+import { ensurePersonalWorkspace } from "./workspace-setup";
 import type { Role } from "@/generated/prisma/client";
 import { connection } from "next/server";
 
@@ -33,7 +33,7 @@ export const getCurrentMembership = cache(async () => {
   console.warn(
     `[workspace] User ${session.user.id} had no workspace; creating one.`,
   );
-  return createPersonalWorkspace(session.user);
+  return ensurePersonalWorkspace(session.user);
 });
 
 export class ForbiddenError extends Error {
