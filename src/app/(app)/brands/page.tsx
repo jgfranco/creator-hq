@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { FilterTab } from "../filter-tab";
 import { listBrands } from "@/lib/brands";
 
 export default function BrandsPage({ searchParams }: PageProps<"/brands">) {
@@ -95,25 +96,5 @@ async function BrandsView({
         </table>
       )}
     </>
-  );
-}
-
-function FilterTab({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={`rounded px-3 py-1.5 ${active ? "bg-gray-100 font-medium" : "text-gray-600 hover:text-black"}`}
-    >
-      {children}
-    </Link>
   );
 }
