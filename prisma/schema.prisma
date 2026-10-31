@@ -63,7 +63,7 @@ model Membership {
 
 model Brand {
   id         String    @id @default(cuid())
-  name       String
+  name       String    @db.Citext // case-insensitive, so "Nike" and "nike" collide
   website    String?
   notes      String?
   archivedAt DateTime?
