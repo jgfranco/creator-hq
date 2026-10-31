@@ -7,7 +7,9 @@ import { toDateInput } from "@/lib/dates";
 import { CampaignForm } from "../../campaign-form";
 import { updateCampaign } from "../../actions";
 
-export default function EditCampaignPage({ params }: PageProps<"/campaigns/[id]/edit">) {
+export default function EditCampaignPage({
+  params,
+}: PageProps<"/campaigns/[id]/edit">) {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold">Edit campaign</h1>
@@ -24,10 +26,17 @@ async function EditCampaignForm({
   params: PageProps<"/campaigns/[id]/edit">["params"];
 }) {
   const { id } = await params;
-  const [campaign, membership] = await Promise.all([getCampaign(id), getCurrentMembership()]);
+  const [campaign, membership] = await Promise.all([
+    getCampaign(id),
+    getCurrentMembership(),
+  ]);
 
   if (membership.role === "VIEWER") {
-    return <p className="text-sm text-gray-600">You don&apos;t have permission to edit campaigns.</p>;
+    return (
+      <p className="text-sm text-gray-600">
+        You don&apos;t have permission to edit campaigns.
+      </p>
+    );
   }
 
   const brands = await listBrandOptions({ includeId: campaign.brand.id });

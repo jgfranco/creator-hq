@@ -4,7 +4,9 @@ import { prisma } from "./db";
 import { getCurrentMembership } from "./workspace";
 import type { CampaignStatus } from "@/generated/prisma/enums";
 
-export async function listCampaigns({ status }: { status?: CampaignStatus } = {}) {
+export async function listCampaigns({
+  status,
+}: { status?: CampaignStatus } = {}) {
   const { workspaceId } = await getCurrentMembership();
 
   return prisma.campaign.findMany({
@@ -38,7 +40,10 @@ export async function getCampaign(id: string) {
       createdAt: true,
       brand: { select: { id: true, name: true, archivedAt: true } },
       deliverables: {
-        orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { createdAt: "asc" }],
+        orderBy: [
+          { dueDate: { sort: "asc", nulls: "last" } },
+          { createdAt: "asc" },
+        ],
         select: {
           id: true,
           type: true,

@@ -12,19 +12,31 @@ import { DeleteCampaignButton } from "./delete-button";
 export default function CampaignPage({ params }: PageProps<"/campaigns/[id]">) {
   return (
     <div>
-      <Link href="/campaigns" className="mb-4 inline-block text-sm text-gray-600 hover:text-black">
+      <Link
+        href="/campaigns"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-black"
+      >
         ← Campaigns
       </Link>
-      <Suspense fallback={<p className="text-sm text-gray-500">Loading campaign…</p>}>
+      <Suspense
+        fallback={<p className="text-sm text-gray-500">Loading campaign…</p>}
+      >
         <CampaignView params={params} />
       </Suspense>
     </div>
   );
 }
 
-async function CampaignView({ params }: { params: PageProps<"/campaigns/[id]">["params"] }) {
+async function CampaignView({
+  params,
+}: {
+  params: PageProps<"/campaigns/[id]">["params"];
+}) {
   const { id } = await params;
-  const [campaign, membership] = await Promise.all([getCampaign(id), getCurrentMembership()]);
+  const [campaign, membership] = await Promise.all([
+    getCampaign(id),
+    getCurrentMembership(),
+  ]);
   const canEdit = membership.role !== "VIEWER";
 
   return (
@@ -32,7 +44,10 @@ async function CampaignView({ params }: { params: PageProps<"/campaigns/[id]">["
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">{campaign.title}</h1>
-          <Link href={`/brands/${campaign.brand.id}`} className="text-sm underline">
+          <Link
+            href={`/brands/${campaign.brand.id}`}
+            className="text-sm underline"
+          >
             {campaign.brand.name}
           </Link>
           {campaign.brand.archivedAt && (
@@ -42,7 +57,10 @@ async function CampaignView({ params }: { params: PageProps<"/campaigns/[id]">["
 
         {canEdit && (
           <div className="flex items-center gap-2">
-            <Link href={`/campaigns/${campaign.id}/edit`} className="rounded border px-3 py-2 text-sm">
+            <Link
+              href={`/campaigns/${campaign.id}/edit`}
+              className="rounded border px-3 py-2 text-sm"
+            >
               Edit
             </Link>
             <DeleteCampaignButton id={campaign.id} title={campaign.title} />
@@ -56,7 +74,11 @@ async function CampaignView({ params }: { params: PageProps<"/campaigns/[id]">["
           <dd className="mt-1">
             {canEdit ? (
               // key remounts the select so it shows the saved status after revalidation
-              <form key={campaign.status} action={setCampaignStatus.bind(null, campaign.id)} className="flex gap-2">
+              <form
+                key={campaign.status}
+                action={setCampaignStatus.bind(null, campaign.id)}
+                className="flex gap-2"
+              >
                 <select
                   name="status"
                   defaultValue={campaign.status}

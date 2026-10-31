@@ -14,7 +14,8 @@ export function Field({
   return (
     <div>
       <label htmlFor={name} className="mb-1 block text-sm font-medium">
-        {label} {hint && <span className="font-normal text-gray-500">({hint})</span>}
+        {label}{" "}
+        {hint && <span className="font-normal text-gray-500">({hint})</span>}
       </label>
       {children}
       {errors?.[0] && (
