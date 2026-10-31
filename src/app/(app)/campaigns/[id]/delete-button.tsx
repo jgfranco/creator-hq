@@ -3,11 +3,22 @@
 import { useTransition } from "react";
 import { deleteCampaign } from "../actions";
 
-export function DeleteCampaignButton({ id, title }: { id: string; title: string }) {
+export function DeleteCampaignButton({
+  id,
+  title,
+}: {
+  id: string;
+  title: string;
+}) {
   const [pending, startTransition] = useTransition();
 
   function handleClick() {
-    if (!confirm(`Delete "${title}" and all its deliverables? This can't be undone.`)) return;
+    if (
+      !confirm(
+        `Delete "${title}" and all its deliverables? This can't be undone.`,
+      )
+    )
+      return;
     startTransition(() => deleteCampaign(id));
   }
 

@@ -8,17 +8,24 @@ import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
 import { CampaignStatus } from "@/generated/prisma/enums";
 
-export default function CampaignsPage({ searchParams }: PageProps<"/campaigns">) {
+export default function CampaignsPage({
+  searchParams,
+}: PageProps<"/campaigns">) {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Campaigns</h1>
-        <Link href="/campaigns/new" className="rounded bg-black px-3 py-2 text-sm text-white">
+        <Link
+          href="/campaigns/new"
+          className="rounded bg-black px-3 py-2 text-sm text-white"
+        >
           New campaign
         </Link>
       </div>
 
-      <Suspense fallback={<p className="text-sm text-gray-500">Loading campaigns…</p>}>
+      <Suspense
+        fallback={<p className="text-sm text-gray-500">Loading campaigns…</p>}
+      >
         <CampaignsView searchParams={searchParams} />
       </Suspense>
     </div>
@@ -47,7 +54,11 @@ async function CampaignsView({
           All
         </FilterTab>
         {Object.values(CampaignStatus).map((s) => (
-          <FilterTab key={s} href={`/campaigns?status=${s}`} active={status === s}>
+          <FilterTab
+            key={s}
+            href={`/campaigns?status=${s}`}
+            active={status === s}
+          >
             {formatEnum(s)}
           </FilterTab>
         ))}
@@ -75,12 +86,18 @@ async function CampaignsView({
             {campaigns.map((campaign) => (
               <tr key={campaign.id} className="border-b last:border-0">
                 <td className="py-2 font-medium">
-                  <Link href={`/campaigns/${campaign.id}`} className="hover:underline">
+                  <Link
+                    href={`/campaigns/${campaign.id}`}
+                    className="hover:underline"
+                  >
                     {campaign.title}
                   </Link>
                 </td>
                 <td className="py-2">
-                  <Link href={`/brands/${campaign.brand.id}`} className="hover:underline">
+                  <Link
+                    href={`/brands/${campaign.brand.id}`}
+                    className="hover:underline"
+                  >
                     {campaign.brand.name}
                   </Link>
                 </td>
@@ -90,7 +107,9 @@ async function CampaignsView({
                     ? `${formatDate(campaign.startDate)} – ${formatDate(campaign.endDate)}`
                     : "—"}
                 </td>
-                <td className="py-2 text-right tabular-nums">{campaign._count.deliverables}</td>
+                <td className="py-2 text-right tabular-nums">
+                  {campaign._count.deliverables}
+                </td>
                 <td className="py-2 text-right tabular-nums">
                   {formatMoney(campaign.feeCents, currency)}
                 </td>

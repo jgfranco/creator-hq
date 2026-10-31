@@ -11,5 +11,8 @@ export function toDateInput(date: Date | null): string {
 
 export function formatDate(date: Date | null, locale = "en-US"): string {
   if (!date) return "—";
-  return date.toLocaleDateString(locale, { timeZone: "UTC", dateStyle: "medium" });
+  return date.toLocaleDateString(locale, {
+    timeZone: "UTC",
+    dateStyle: "medium",
+  });
 }

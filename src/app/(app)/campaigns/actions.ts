@@ -4,11 +4,22 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentMembership, requireRole, ForbiddenError } from "@/lib/workspace";
+import {
+  getCurrentMembership,
+  requireRole,
+  ForbiddenError,
+} from "@/lib/workspace";
 import { campaignSchema, type CampaignInput } from "@/lib/validation/campaign";
 import { CampaignStatus } from "@/generated/prisma/enums";
 
-const FIELDS = ["title", "brandId", "status", "fee", "startDate", "endDate"] as const;
+const FIELDS = [
+  "title",
+  "brandId",
+  "status",
+  "fee",
+  "startDate",
+  "endDate",
+] as const;
 type Field = (typeof FIELDS)[number];
 
 export type CampaignFormState = {
@@ -35,13 +46,19 @@ async function prepareCampaignWrite(
   try {
     requireRole(membership, ["OWNER", "MANAGER"]);
   } catch (error) {
-    if (error instanceof ForbiddenError) return { ok: false, state: { message: error.message, values } };
+    if (error instanceof ForbiddenError)
+      return { ok: false, state: { message: error.message, values } };
     throw error;
   }
 
-  const parsed = campaignSchema(membership.workspace.currency).safeParse(values);
+  const parsed = campaignSchema(membership.workspace.currency).safeParse(
+    values,
+  );
   if (!parsed.success) {
-    return { ok: false, state: { fieldErrors: z.flattenError(parsed.error).fieldErrors, values } };
+    return {
+      ok: false,
+      state: { fieldErrors: z.flattenError(parsed.error).fieldErrors, values },
+    };
   }
 
   // The brandId comes from the client, so it must be checked against the caller's workspace.
@@ -51,7 +68,10 @@ async function prepareCampaignWrite(
     select: { id: true, archivedAt: true },
   });
   if (!brand || (brand.archivedAt && brand.id !== currentBrandId)) {
-    return { ok: false, state: { fieldErrors: { brandId: ["Choose an active brand"] }, values } };
+    return {
+      ok: false,
+      state: { fieldErrors: { brandId: ["Choose an active brand"] }, values },
+    };
   }
 
   return { ok: true, workspaceId: membership.workspaceId, data: parsed.data };
@@ -86,7 +106,9 @@ export async function updateCampaign(
   });
   if (!existing) notFound();
 
-  const write = await prepareCampaignWrite(formData, { currentBrandId: existing.brandId });
+  const write = await prepareCampaignWrite(formData, {
+    currentBrandId: existing.brandId,
+  });
   if (!write.ok) return write.state;
 
   // updateMany so the workspace scope is part of the WHERE clause

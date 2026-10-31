@@ -9,19 +9,31 @@ import { setBrandArchived } from "../actions";
 export default function BrandPage({ params }: PageProps<"/brands/[id]">) {
   return (
     <div>
-      <Link href="/brands" className="mb-4 inline-block text-sm text-gray-600 hover:text-black">
+      <Link
+        href="/brands"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-black"
+      >
         ← Brands
       </Link>
-      <Suspense fallback={<p className="text-sm text-gray-500">Loading brand…</p>}>
+      <Suspense
+        fallback={<p className="text-sm text-gray-500">Loading brand…</p>}
+      >
         <BrandView params={params} />
       </Suspense>
     </div>
   );
 }
 
-async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params"] }) {
+async function BrandView({
+  params,
+}: {
+  params: PageProps<"/brands/[id]">["params"];
+}) {
   const { id } = await params;
-  const [brand, membership] = await Promise.all([getBrand(id), getCurrentMembership()]);
+  const [brand, membership] = await Promise.all([
+    getBrand(id),
+    getCurrentMembership(),
+  ]);
   const canEdit = membership.role !== "VIEWER";
   const isArchived = brand.archivedAt !== null;
 
@@ -51,11 +63,17 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
 
         {canEdit && (
           <div className="flex items-center gap-2">
-            <Link href={`/brands/${brand.id}/edit`} className="rounded border px-3 py-2 text-sm">
+            <Link
+              href={`/brands/${brand.id}/edit`}
+              className="rounded border px-3 py-2 text-sm"
+            >
               Edit
             </Link>
             <form action={setBrandArchived.bind(null, brand.id, !isArchived)}>
-              <button type="submit" className="rounded border px-3 py-2 text-sm">
+              <button
+                type="submit"
+                className="rounded border px-3 py-2 text-sm"
+              >
                 {isArchived ? "Unarchive" : "Archive"}
               </button>
             </form>
@@ -63,7 +81,11 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
         )}
       </div>
 
-      {brand.notes && <p className="mb-8 whitespace-pre-line text-sm text-gray-700">{brand.notes}</p>}
+      {brand.notes && (
+        <p className="mb-8 whitespace-pre-line text-sm text-gray-700">
+          {brand.notes}
+        </p>
+      )}
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Contacts</h2>
@@ -74,9 +96,15 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
             {brand.contacts.map((contact) => (
               <li key={contact.id}>
                 <span className="font-medium">{contact.name}</span>
-                {contact.isPrimary && <span className="ml-2 text-xs text-gray-500">Primary</span>}
-                {contact.title && <span className="block text-gray-500">{contact.title}</span>}
-                {contact.email && <span className="block text-gray-500">{contact.email}</span>}
+                {contact.isPrimary && (
+                  <span className="ml-2 text-xs text-gray-500">Primary</span>
+                )}
+                {contact.title && (
+                  <span className="block text-gray-500">{contact.title}</span>
+                )}
+                {contact.email && (
+                  <span className="block text-gray-500">{contact.email}</span>
+                )}
               </li>
             ))}
           </ul>
@@ -87,13 +115,18 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Campaigns</h2>
           {canEdit && !isArchived && (
-            <Link href={`/campaigns/new?brandId=${brand.id}`} className="text-sm underline">
+            <Link
+              href={`/campaigns/new?brandId=${brand.id}`}
+              className="text-sm underline"
+            >
               New campaign
             </Link>
           )}
         </div>
         {brand.campaigns.length === 0 ? (
-          <p className="text-sm text-gray-500">No campaigns with this brand yet.</p>
+          <p className="text-sm text-gray-500">
+            No campaigns with this brand yet.
+          </p>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b text-gray-500">
@@ -107,13 +140,19 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
               {brand.campaigns.map((campaign) => (
                 <tr key={campaign.id} className="border-b last:border-0">
                   <td className="py-2">
-                    <Link href={`/campaigns/${campaign.id}`} className="hover:underline">
+                    <Link
+                      href={`/campaigns/${campaign.id}`}
+                      className="hover:underline"
+                    >
                       {campaign.title}
                     </Link>
                   </td>
                   <td className="py-2">{formatEnum(campaign.status)}</td>
                   <td className="py-2 text-right tabular-nums">
-                    {formatMoney(campaign.feeCents, membership.workspace.currency)}
+                    {formatMoney(
+                      campaign.feeCents,
+                      membership.workspace.currency,
+                    )}
                   </td>
                 </tr>
               ))}

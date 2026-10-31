@@ -28,14 +28,19 @@ export function CampaignForm({
   submitLabel,
   cancelHref,
 }: {
-  action: (state: CampaignFormState, formData: FormData) => Promise<CampaignFormState>;
+  action: (
+    state: CampaignFormState,
+    formData: FormData,
+  ) => Promise<CampaignFormState>;
   brands: { id: string; name: string }[];
   currency: string;
   defaultValues?: CampaignValues;
   submitLabel: string;
   cancelHref: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, { values: defaultValues });
+  const [state, formAction, pending] = useActionState(action, {
+    values: defaultValues,
+  });
   const values = state.values ?? defaultValues;
   const errors = state.fieldErrors ?? {};
 
@@ -61,15 +66,27 @@ export function CampaignForm({
 
   return (
     // key resets uncontrolled inputs to the returned values after a failed submit
-    <form key={JSON.stringify(values)} action={formAction} className="max-w-lg space-y-5">
+    <form
+      key={JSON.stringify(values)}
+      action={formAction}
+      className="max-w-lg space-y-5"
+    >
       {state.message && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
           {state.message}
         </p>
       )}
 
       <Field label="Title" name="title" errors={errors.title}>
-        <input {...fieldProps("title")} required maxLength={150} className={inputClass} />
+        <input
+          {...fieldProps("title")}
+          required
+          maxLength={150}
+          className={inputClass}
+        />
       </Field>
 
       <Field label="Brand" name="brandId" errors={errors.brandId}>
@@ -95,16 +112,44 @@ export function CampaignForm({
         </select>
       </Field>
 
-      <Field label={`Fee (${currency})`} name="fee" hint="Optional" errors={errors.fee}>
-        <input {...fieldProps("fee")} inputMode="decimal" placeholder="0.00" className={inputClass} />
+      <Field
+        label={`Fee (${currency})`}
+        name="fee"
+        hint="Optional"
+        errors={errors.fee}
+      >
+        <input
+          {...fieldProps("fee")}
+          inputMode="decimal"
+          placeholder="0.00"
+          className={inputClass}
+        />
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Start date" name="startDate" hint="Optional" errors={errors.startDate}>
-          <input {...fieldProps("startDate")} type="date" className={inputClass} />
+        <Field
+          label="Start date"
+          name="startDate"
+          hint="Optional"
+          errors={errors.startDate}
+        >
+          <input
+            {...fieldProps("startDate")}
+            type="date"
+            className={inputClass}
+          />
         </Field>
-        <Field label="End date" name="endDate" hint="Optional" errors={errors.endDate}>
-          <input {...fieldProps("endDate")} type="date" className={inputClass} />
+        <Field
+          label="End date"
+          name="endDate"
+          hint="Optional"
+          errors={errors.endDate}
+        >
+          <input
+            {...fieldProps("endDate")}
+            type="date"
+            className={inputClass}
+          />
         </Field>
       </div>
 
@@ -116,7 +161,10 @@ export function CampaignForm({
         >
           {pending ? "Saving…" : submitLabel}
         </button>
-        <Link href={cancelHref} className="text-sm text-gray-600 hover:text-black">
+        <Link
+          href={cancelHref}
+          className="text-sm text-gray-600 hover:text-black"
+        >
           Cancel
         </Link>
       </div>

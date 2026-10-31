@@ -1,6 +1,10 @@
 function fractionDigitsFor(currency: string): number {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).resolvedOptions()
-    .maximumFractionDigits ?? 2;
+  return (
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).resolvedOptions().maximumFractionDigits ?? 2
+  );
 }
 
 export function formatMoney(
@@ -24,7 +28,10 @@ export function formatMoney(
 export function parseMoney(input: string, currency: string): number | null {
   const fractionDigits = fractionDigitsFor(currency);
   const text = input.trim().replaceAll(",", "");
-  const pattern = fractionDigits > 0 ? new RegExp(`^\\d+(\\.\\d{0,${fractionDigits}})?$`) : /^\d+$/;
+  const pattern =
+    fractionDigits > 0
+      ? new RegExp(`^\\d+(\\.\\d{0,${fractionDigits}})?$`)
+      : /^\d+$/;
   if (!pattern.test(text)) return null;
 
   const [whole, fraction = ""] = text.split(".");
@@ -33,7 +40,10 @@ export function parseMoney(input: string, currency: string): number | null {
 }
 
 // Inverse of parseMoney for pre-filling inputs: 150050 → "1500.50"
-export function toMoneyInput(amountInMinorUnits: number | null, currency: string): string {
+export function toMoneyInput(
+  amountInMinorUnits: number | null,
+  currency: string,
+): string {
   if (amountInMinorUnits === null) return "";
   const fractionDigits = fractionDigitsFor(currency);
   return (amountInMinorUnits / 10 ** fractionDigits).toFixed(fractionDigits);
