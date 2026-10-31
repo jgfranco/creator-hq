@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getCurrentMembership } from "@/lib/workspace";
 import { listCampaigns } from "@/lib/campaigns";
 import { formatMoney } from "@/lib/money";
+import { formatEnum } from "@/lib/format";
 
 export default function DashboardPage() {
   return (
@@ -79,9 +80,4 @@ async function CampaignsTable() {
       </tbody>
     </table>
   );
-}
-
-function formatEnum(value: string) {
-  const text = value.toLowerCase().replaceAll("_", " ");
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }

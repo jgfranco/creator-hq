@@ -1,4 +1,5 @@
 import "server-only";
+import { notFound } from "next/navigation";
 import { prisma } from "./db";
 import { getCurrentMembership } from "./workspace";
 
@@ -23,4 +24,30 @@ export async function listBrands({ archived = false }: { archived?: boolean } = 
       _count: { select: { campaigns: true } },
     },
   });
+}
+
+export async function getBrand(id: string) {
+  const { workspaceId } = await getCurrentMembership();
+
+  const brand = await prisma.brand.findFirst({
+    where: { id, workspaceId },
+    select: {
+      id: true,
+      name: true,
+      website: true,
+      notes: true,
+      archivedAt: true,
+      contacts: {
+        orderBy: [{ isPrimary: "desc" }, { name: "asc" }],
+        select: { id: true, name: true, email: true, title: true, isPrimary: true },
+      },
+      campaigns: {
+        orderBy: { createdAt: "desc" },
+        select: { id: true, title: true, status: true, feeCents: true },
+      },
+    },
+  });
+
+  if (!brand) notFound();
+  return brand;
 }
