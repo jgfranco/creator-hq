@@ -51,3 +51,18 @@ export async function getBrand(id: string) {
   if (!brand) notFound();
   return brand;
 }
+
+// Brands a campaign can be assigned to: active ones, plus the campaign's current
+// brand when editing (so an archived brand doesn't silently drop out of the select).
+export async function listBrandOptions({ includeId }: { includeId?: string } = {}) {
+  const { workspaceId } = await getCurrentMembership();
+
+  return prisma.brand.findMany({
+    where: {
+      workspaceId,
+      OR: [{ archivedAt: null }, ...(includeId ? [{ id: includeId }] : [])],
+    },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+}

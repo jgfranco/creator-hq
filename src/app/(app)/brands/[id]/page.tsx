@@ -84,7 +84,14 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Campaigns</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Campaigns</h2>
+          {canEdit && !isArchived && (
+            <Link href={`/campaigns/new?brandId=${brand.id}`} className="text-sm underline">
+              New campaign
+            </Link>
+          )}
+        </div>
         {brand.campaigns.length === 0 ? (
           <p className="text-sm text-gray-500">No campaigns with this brand yet.</p>
         ) : (
@@ -99,7 +106,11 @@ async function BrandView({ params }: { params: PageProps<"/brands/[id]">["params
             <tbody>
               {brand.campaigns.map((campaign) => (
                 <tr key={campaign.id} className="border-b last:border-0">
-                  <td className="py-2">{campaign.title}</td>
+                  <td className="py-2">
+                    <Link href={`/campaigns/${campaign.id}`} className="hover:underline">
+                      {campaign.title}
+                    </Link>
+                  </td>
                   <td className="py-2">{formatEnum(campaign.status)}</td>
                   <td className="py-2 text-right tabular-nums">
                     {formatMoney(campaign.feeCents, membership.workspace.currency)}

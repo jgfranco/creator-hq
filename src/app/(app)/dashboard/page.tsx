@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { getCurrentMembership } from "@/lib/workspace";
 import { listCampaigns } from "@/lib/campaigns";
 import { formatMoney } from "@/lib/money";
@@ -68,7 +69,11 @@ async function CampaignsTable() {
       <tbody>
         {campaigns.map((campaign) => (
           <tr key={campaign.id} className="border-b last:border-0">
-            <td className="py-2">{campaign.title}</td>
+            <td className="py-2">
+              <Link href={`/campaigns/${campaign.id}`} className="hover:underline">
+                {campaign.title}
+              </Link>
+            </td>
             <td className="py-2">{campaign.brand.name}</td>
             <td className="py-2">{formatEnum(campaign.status)}</td>
             <td className="py-2">{campaign._count.deliverables}</td>

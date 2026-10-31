@@ -15,6 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </Link>
             <nav className="flex gap-1">
               <NavLink href="/dashboard">Dashboard</NavLink>
+              <NavLink href="/campaigns">Campaigns</NavLink>
               <NavLink href="/brands">Brands</NavLink>
             </nav>
           </div>
