@@ -16,3 +16,8 @@ export function formatDate(date: Date | null, locale = "en-US"): string {
     dateStyle: "medium",
   });
 }
+
+// Today as a calendar day (UTC midnight), matching how dates are stored
+export function today(): Date {
+  return parseDateInput(new Date().toISOString().slice(0, 10));
+}

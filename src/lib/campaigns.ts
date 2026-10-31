@@ -51,6 +51,7 @@ export async function getCampaign(id: string) {
           status: true,
           dueDate: true,
           liveUrl: true,
+          revisionCount: true,
         },
       },
     },
