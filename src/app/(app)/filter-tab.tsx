@@ -13,7 +13,11 @@ export function FilterTab({
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`rounded px-3 py-1.5 ${active ? "bg-gray-100 font-medium" : "text-gray-600 hover:text-black"}`}
+      className={`rounded px-3 py-1.5 ${
+        active
+          ? "bg-gray-100 font-medium text-gray-900"
+          : "text-gray-600 hover:text-gray-950"
+      }`}
     >
       {children}
     </Link>

@@ -12,10 +12,76 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Dark mode, screen only: printed invoices stay black on white. */
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    /* Native controls (date pickers, selects, scrollbars) follow too */
+    color-scheme: dark;
+
+    /*
+     * The app is styled light-first (gray-100 surfaces, gray-600 text, red-50
+     * alerts…). Mirroring each palette (50↔950, 100↔900, …) turns those into
+     * their dark equivalents without a dark: variant on every class.
+     * Values are Tailwind v4's defaults, mirrored.
+     */
+    --color-gray-50: oklch(13% 0.028 261.692); /* 950 */
+    --color-gray-100: oklch(21% 0.034 264.665); /* 900 */
+    --color-gray-200: oklch(27.8% 0.033 256.848); /* 800 */
+    --color-gray-300: oklch(37.3% 0.034 259.733); /* 700 */
+    --color-gray-400: oklch(44.6% 0.03 256.802); /* 600 */
+    /* gray-500 (muted text) gets 400, not itself: 500 is too dim on near-black */
+    --color-gray-500: oklch(70.7% 0.022 261.325); /* 400 */
+    --color-gray-600: oklch(70.7% 0.022 261.325); /* 400 */
+    --color-gray-700: oklch(87.2% 0.01 258.338); /* 300 */
+    --color-gray-800: oklch(92.8% 0.006 264.531); /* 200 */
+    --color-gray-900: oklch(96.7% 0.003 264.542); /* 100 */
+    --color-gray-950: oklch(98.5% 0.002 247.839); /* 50 */
+    --color-red-50: oklch(25.8% 0.092 26.042); /* 950 */
+    --color-red-100: oklch(39.6% 0.141 25.723); /* 900 */
+    --color-red-200: oklch(44.4% 0.177 26.899); /* 800 */
+    --color-red-300: oklch(50.5% 0.213 27.518); /* 700 */
+    --color-red-400: oklch(57.7% 0.245 27.325); /* 600 */
+    --color-red-500: oklch(63.7% 0.237 25.331); /* 500 */
+    --color-red-600: oklch(70.4% 0.191 22.216); /* 400 */
+    --color-red-700: oklch(80.8% 0.114 19.571); /* 300 */
+    --color-red-800: oklch(88.5% 0.062 18.334); /* 200 */
+    --color-red-900: oklch(93.6% 0.032 17.717); /* 100 */
+    --color-red-950: oklch(97.1% 0.013 17.38); /* 50 */
+    --color-amber-50: oklch(27.9% 0.077 45.635); /* 950 */
+    --color-amber-100: oklch(41.4% 0.112 45.904); /* 900 */
+    --color-amber-200: oklch(47.3% 0.137 46.201); /* 800 */
+    --color-amber-300: oklch(55.5% 0.163 48.998); /* 700 */
+    --color-amber-400: oklch(66.6% 0.179 58.318); /* 600 */
+    --color-amber-500: oklch(76.9% 0.188 70.08); /* 500 */
+    --color-amber-600: oklch(82.8% 0.189 84.429); /* 400 */
+    --color-amber-700: oklch(87.9% 0.169 91.605); /* 300 */
+    --color-amber-800: oklch(92.4% 0.12 95.746); /* 200 */
+    --color-amber-900: oklch(96.2% 0.059 95.617); /* 100 */
+    --color-amber-950: oklch(98.7% 0.022 95.277); /* 50 */
+    --color-green-50: oklch(26.6% 0.065 152.934); /* 950 */
+    --color-green-100: oklch(39.3% 0.095 152.535); /* 900 */
+    --color-green-200: oklch(44.8% 0.119 151.328); /* 800 */
+    --color-green-300: oklch(52.7% 0.154 150.069); /* 700 */
+    --color-green-400: oklch(62.7% 0.194 149.214); /* 600 */
+    --color-green-500: oklch(72.3% 0.219 149.579); /* 500 */
+    --color-green-600: oklch(79.2% 0.209 151.711); /* 400 */
+    --color-green-700: oklch(87.1% 0.15 154.449); /* 300 */
+    --color-green-800: oklch(92.5% 0.084 155.995); /* 200 */
+    --color-green-900: oklch(96.2% 0.044 156.743); /* 100 */
+    --color-green-950: oklch(98.2% 0.018 155.826); /* 50 */
+    --color-blue-50: oklch(28.2% 0.091 267.935); /* 950 */
+    --color-blue-100: oklch(37.9% 0.146 265.522); /* 900 */
+    --color-blue-200: oklch(42.4% 0.199 265.638); /* 800 */
+    --color-blue-300: oklch(48.8% 0.243 264.376); /* 700 */
+    --color-blue-400: oklch(54.6% 0.245 262.881); /* 600 */
+    --color-blue-500: oklch(62.3% 0.214 259.815); /* 500 */
+    --color-blue-600: oklch(70.7% 0.165 254.624); /* 400 */
+    --color-blue-700: oklch(80.9% 0.105 251.813); /* 300 */
+    --color-blue-800: oklch(88.2% 0.059 254.128); /* 200 */
+    --color-blue-900: oklch(93.2% 0.032 255.585); /* 100 */
+    --color-blue-950: oklch(97% 0.014 254.604); /* 50 */
   }
 }
 

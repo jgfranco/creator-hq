@@ -28,7 +28,9 @@ function NavLinkView({ href, children, isActive }: NavLinkProps & { isActive: bo
       href={href}
       aria-current={isActive ? "page" : undefined}
       className={`rounded px-3 py-1.5 text-sm ${
-        isActive ? "bg-gray-100 font-medium" : "text-gray-600 hover:text-black"
+        isActive
+          ? "bg-gray-100 font-medium text-gray-900"
+          : "text-gray-600 hover:text-gray-950"
       }`}
     >
       {children}
