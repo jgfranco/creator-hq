@@ -116,6 +116,8 @@ async function main() {
     console.log(`✔ Brand: ${brand.name}`);
   }
 
+  // Invoices block campaign deletion, so clear them first (payments cascade)
+  await prisma.invoice.deleteMany({ where: { workspaceId: workspace.id } });
   await prisma.campaign.deleteMany({ where: { workspaceId: workspace.id } });
 
   const brandByName = (name: string) => {
@@ -289,6 +291,76 @@ async function main() {
     },
   });
   console.log(`✔ Campaign: ${paid.title} (${paid.status})`);
+
+  // Invoices: numbers are handed out from the workspace counter, like sendInvoice does
+  let nextNumber = 1;
+  const invoice = async (
+    campaign: { id: string; title: string; feeCents: number | null },
+    {
+      status,
+      issuedDaysAgo,
+      payments = [],
+    }: {
+      status: "DRAFT" | "SENT" | "PAID";
+      issuedDaysAgo: number;
+      payments?: { amountCents: number; paidDaysAgo: number }[];
+    },
+  ) => {
+    const amount = campaign.feeCents ?? 0;
+    const issueDate = daysFromNow(-issuedDaysAgo);
+    const created = await prisma.invoice.create({
+      data: {
+        workspaceId: workspace.id,
+        campaignId: campaign.id,
+        status,
+        number: status === "DRAFT" ? null : nextNumber++,
+        sentAt: status === "DRAFT" ? null : issueDate,
+        currency: workspace.currency,
+        issueDate,
+        dueDate: daysFromNow(-issuedDaysAgo + 30),
+        totalCents: amount,
+        lineItems: {
+          create: [
+            {
+              description: campaign.title,
+              quantity: 1,
+              unitAmountCents: amount,
+              position: 0,
+            },
+          ],
+        },
+        payments: {
+          create: payments.map((p) => ({
+            amountCents: p.amountCents,
+            paidOn: daysFromNow(-p.paidDaysAgo),
+            method: "BANK_TRANSFER" as const,
+          })),
+        },
+      },
+    });
+    console.log(
+      `✔ Invoice: ${created.number ?? "draft"} for ${campaign.title} (${status})`,
+    );
+  };
+
+  await invoice(paid, {
+    status: "PAID",
+    issuedDaysAgo: 50,
+    payments: [{ amountCents: paid.feeCents ?? 0, paidDaysAgo: 35 }],
+  });
+  // Issued 40 days ago on net-30, so it shows as overdue
+  await invoice(posted, { status: "SENT", issuedDaysAgo: 40 });
+  // Sending an invoice moves its campaign to INVOICED in the app; mirror that here
+  await prisma.campaign.update({
+    where: { id: posted.id },
+    data: { status: "INVOICED" },
+  });
+  await invoice(contracted, { status: "DRAFT", issuedDaysAgo: 0 });
+
+  await prisma.workspace.update({
+    where: { id: workspace.id },
+    data: { nextInvoiceNumber: nextNumber },
+  });
 }
 
 main()

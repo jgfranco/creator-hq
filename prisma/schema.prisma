@@ -34,9 +34,13 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Next number handed out when an invoice is sent (INV-0001, INV-0002, …)
+  nextInvoiceNumber Int @default(1)
+
   memberships Membership[]
   brands      Brand[]
   campaigns   Campaign[]
+  invoices    Invoice[]
 }
 
 enum Role {
@@ -122,6 +126,7 @@ model Campaign {
   brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Restrict)
 
   deliverables Deliverable[]
+  invoices     Invoice[]
 
   @@index([workspaceId, status])
   @@index([brandId])
@@ -231,4 +236,84 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@index([identifier])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  VOID
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  // Assigned when the invoice is sent, so deleted drafts never leave gaps
+  number     Int?
+  status     InvoiceStatus @default(DRAFT)
+  // Copied from the workspace so later currency changes don't alter old invoices
+  currency   String        @db.Char(3)
+  issueDate  DateTime
+  dueDate    DateTime
+  notes      String?
+  // Sum of line items, kept in sync on every write so lists don't need to aggregate
+  totalCents Int           @default(0)
+  sentAt     DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  campaignId String
+  // NoAction (checked at end of statement) rather than Restrict, so deleting a whole
+  // workspace still cascades cleanly while deleting an invoiced campaign is blocked
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: NoAction)
+
+  lineItems InvoiceLineItem[]
+  payments  Payment[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, status])
+  @@index([campaignId])
+}
+
+model InvoiceLineItem {
+  id              String @id @default(cuid())
+  description     String
+  quantity        Int    @default(1)
+  unitAmountCents Int
+  position        Int
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  PAYPAL
+  STRIPE
+  WISE
+  CHECK
+  CASH
+  OTHER
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  amountCents Int
+  paidOn      DateTime
+  method      PaymentMethod
+  reference   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  invoiceId String
+  // Cascade so deleting a workspace works; the app only deletes draft invoices,
+  // which can't have payments
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
 }
