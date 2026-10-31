@@ -7,7 +7,7 @@ import { SignOutButton } from "./sign-out-button";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
-      <header className="border-b">
+      <header className="border-b print:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="font-semibold">
@@ -17,6 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <NavLink href="/dashboard">Dashboard</NavLink>
               <NavLink href="/campaigns">Campaigns</NavLink>
               <NavLink href="/brands">Brands</NavLink>
+              <NavLink href="/invoices">Invoices</NavLink>
             </nav>
           </div>
 

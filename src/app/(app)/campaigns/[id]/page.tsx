@@ -7,7 +7,10 @@ import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
 import { CampaignStatus, DeliverableStatus } from "@/generated/prisma/enums";
 import { deleteCampaign, setCampaignStatus } from "../actions";
-import { DeleteButton } from "../../delete-button";
+import { DeleteButton } from "../../action-button";
+import { sumPayments } from "@/lib/invoices";
+import { formatInvoiceNumber } from "@/lib/invoice-rules";
+import { InvoiceStatusBadge } from "../../invoices/status-badge";
 import {
   deleteDeliverable,
   setDeliverableStatus,
@@ -231,6 +234,72 @@ async function CampaignView({
                         </div>
                       </td>
                     )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Invoices</h2>
+          {canEdit && campaign.status !== "CANCELLED" && (
+            <Link
+              href={`/invoices/new?campaignId=${campaign.id}`}
+              className="text-sm underline"
+            >
+              New invoice
+            </Link>
+          )}
+        </div>
+        {campaign.invoices.length === 0 ? (
+          <p className="rounded border border-dashed p-6 text-center text-sm text-gray-500">
+            No invoices yet. Bill the brand once the work is agreed or
+            delivered.
+          </p>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead className="border-b text-gray-500">
+              <tr>
+                <th className="py-2 font-medium">Invoice</th>
+                <th className="py-2 font-medium">Status</th>
+                <th className="py-2 font-medium">Due</th>
+                <th className="py-2 text-right font-medium">Total</th>
+                <th className="py-2 text-right font-medium">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campaign.invoices.map((invoice) => {
+                const owed =
+                  invoice.status === "SENT" ||
+                  invoice.status === "PARTIALLY_PAID";
+                const balance =
+                  invoice.totalCents - sumPayments(invoice.payments);
+                return (
+                  <tr key={invoice.id} className="border-b last:border-0">
+                    <td className="py-2">
+                      <Link
+                        href={`/invoices/${invoice.id}`}
+                        className="hover:underline"
+                      >
+                        {formatInvoiceNumber(invoice.number)}
+                      </Link>
+                    </td>
+                    <td className="py-2">
+                      <InvoiceStatusBadge
+                        status={invoice.status}
+                        dueDate={invoice.dueDate}
+                      />
+                    </td>
+                    <td className="py-2">{formatDate(invoice.dueDate)}</td>
+                    <td className="py-2 text-right tabular-nums">
+                      {formatMoney(invoice.totalCents, invoice.currency)}
+                    </td>
+                    <td className="py-2 text-right tabular-nums">
+                      {owed ? formatMoney(balance, invoice.currency) : "—"}
+                    </td>
                   </tr>
                 );
               })}
