@@ -1,13 +1,7 @@
 import { z } from "zod";
 import { CampaignStatus } from "@/generated/prisma/enums";
 import { parseMoney } from "@/lib/money";
-import { parseDateInput } from "@/lib/dates";
-
-const optionalDate = z
-  .string()
-  .trim()
-  .pipe(z.union([z.literal(""), z.iso.date({ error: "Enter a valid date" })]))
-  .transform((value) => (value === "" ? null : parseDateInput(value)));
+import { optionalDate } from "./fields";
 
 // Factory because the fee's allowed decimals depend on the workspace currency.
 export function campaignSchema(currency: string) {
