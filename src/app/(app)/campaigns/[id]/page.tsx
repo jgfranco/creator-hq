@@ -2,12 +2,16 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { getCampaign } from "@/lib/campaigns";
 import { getCurrentMembership } from "@/lib/workspace";
-import { formatEnum } from "@/lib/format";
+import { formatEnum, formatPlatform } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 import { formatDate } from "@/lib/dates";
-import { CampaignStatus } from "@/generated/prisma/enums";
-import { setCampaignStatus } from "../actions";
-import { DeleteCampaignButton } from "./delete-button";
+import { CampaignStatus, DeliverableStatus } from "@/generated/prisma/enums";
+import { deleteCampaign, setCampaignStatus } from "../actions";
+import { DeleteButton } from "../../delete-button";
+import {
+  deleteDeliverable,
+  setDeliverableStatus,
+} from "./deliverables/actions";
 
 export default function CampaignPage({ params }: PageProps<"/campaigns/[id]">) {
   return (
@@ -63,7 +67,10 @@ async function CampaignView({
             >
               Edit
             </Link>
-            <DeleteCampaignButton id={campaign.id} title={campaign.title} />
+            <DeleteButton
+              action={deleteCampaign.bind(null, campaign.id)}
+              confirmMessage={`Delete "${campaign.title}" and all its deliverables? This can't be undone.`}
+            />
           </div>
         )}
       </div>
@@ -117,43 +124,116 @@ async function CampaignView({
       </dl>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Deliverables</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Deliverables</h2>
+          {canEdit && (
+            <Link
+              href={`/campaigns/${campaign.id}/deliverables/new`}
+              className="text-sm underline"
+            >
+              Add deliverable
+            </Link>
+          )}
+        </div>
         {campaign.deliverables.length === 0 ? (
-          <p className="text-sm text-gray-500">No deliverables yet.</p>
+          <p className="rounded border border-dashed p-6 text-center text-sm text-gray-500">
+            No deliverables yet. Add the posts, videos and other content this
+            deal requires.
+          </p>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b text-gray-500">
               <tr>
-                <th className="py-2 font-medium">Type</th>
-                <th className="py-2 font-medium">Platform</th>
+                <th className="py-2 font-medium">Deliverable</th>
                 <th className="py-2 font-medium">Status</th>
                 <th className="py-2 font-medium">Due</th>
+                <th className="py-2 text-right font-medium">Revisions</th>
                 <th className="py-2 font-medium">Link</th>
+                {canEdit && <th className="py-2" aria-label="Actions" />}
               </tr>
             </thead>
             <tbody>
-              {campaign.deliverables.map((deliverable) => (
-                <tr key={deliverable.id} className="border-b last:border-0">
-                  <td className="py-2">{formatEnum(deliverable.type)}</td>
-                  <td className="py-2">{formatEnum(deliverable.platform)}</td>
-                  <td className="py-2">{formatEnum(deliverable.status)}</td>
-                  <td className="py-2">{formatDate(deliverable.dueDate)}</td>
-                  <td className="py-2">
-                    {deliverable.liveUrl ? (
-                      <a
-                        href={deliverable.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        View
-                      </a>
-                    ) : (
-                      "—"
+              {campaign.deliverables.map((deliverable) => {
+                const label = `${formatPlatform(deliverable.platform)} ${formatEnum(deliverable.type).toLowerCase()}`;
+                return (
+                  <tr key={deliverable.id} className="border-b last:border-0">
+                    <td className="py-2">{label}</td>
+                    <td className="py-2">
+                      {canEdit ? (
+                        <form
+                          key={deliverable.status}
+                          action={setDeliverableStatus.bind(
+                            null,
+                            campaign.id,
+                            deliverable.id,
+                          )}
+                          className="flex gap-1"
+                        >
+                          <select
+                            name="status"
+                            defaultValue={deliverable.status}
+                            aria-label={`Status of ${label}`}
+                            className="rounded border px-1 py-0.5 text-xs"
+                          >
+                            {Object.values(DeliverableStatus).map((status) => (
+                              <option key={status} value={status}>
+                                {formatEnum(status)}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="submit"
+                            className="rounded border px-1.5 py-0.5 text-xs"
+                          >
+                            Update
+                          </button>
+                        </form>
+                      ) : (
+                        formatEnum(deliverable.status)
+                      )}
+                    </td>
+                    <td className="py-2">{formatDate(deliverable.dueDate)}</td>
+                    <td className="py-2 text-right tabular-nums">
+                      {deliverable.revisionCount}
+                    </td>
+                    <td className="py-2">
+                      {deliverable.liveUrl ? (
+                        <a
+                          href={deliverable.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    {canEdit && (
+                      <td className="py-2">
+                        <div className="flex justify-end gap-1">
+                          <Link
+                            href={`/campaigns/${campaign.id}/deliverables/${deliverable.id}/edit`}
+                            className="rounded border px-2 py-1 text-xs"
+                          >
+                            Edit
+                          </Link>
+                          <DeleteButton
+                            action={deleteDeliverable.bind(
+                              null,
+                              campaign.id,
+                              deliverable.id,
+                            )}
+                            confirmMessage={`Delete this ${label}? This can't be undone.`}
+                            size="sm"
+                          />
+                        </div>
+                      </td>
                     )}
-                  </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
