@@ -21,7 +21,7 @@ export default function CampaignPage({ params }: PageProps<"/campaigns/[id]">) {
     <div>
       <Link
         href="/campaigns"
-        className="mb-4 inline-block text-sm text-gray-600 hover:text-black"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-gray-950"
       >
         ← Campaigns
       </Link>

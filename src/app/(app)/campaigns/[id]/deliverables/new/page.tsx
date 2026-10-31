@@ -30,7 +30,7 @@ async function NewDeliverable({
     <div>
       <Link
         href={`/campaigns/${campaign.id}`}
-        className="mb-4 inline-block text-sm text-gray-600 hover:text-black"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-gray-950"
       >
         ← {campaign.title}
       </Link>

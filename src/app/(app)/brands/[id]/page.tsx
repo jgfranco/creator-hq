@@ -11,7 +11,7 @@ export default function BrandPage({ params }: PageProps<"/brands/[id]">) {
     <div>
       <Link
         href="/brands"
-        className="mb-4 inline-block text-sm text-gray-600 hover:text-black"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-gray-950"
       >
         ← Brands
       </Link>

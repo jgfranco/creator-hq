@@ -6,7 +6,7 @@ type ActionResult = { error?: string } | void;
 
 const VARIANTS = {
   default: "border hover:bg-gray-50",
-  primary: "border border-black bg-black text-white hover:bg-gray-800",
+  primary: "border border-gray-900 bg-gray-900 text-gray-50 hover:bg-gray-800",
   danger: "border border-red-200 text-red-700 hover:bg-red-50",
 };
 

@@ -20,7 +20,7 @@ export default function InvoicesPage({ searchParams }: PageProps<"/invoices">) {
         <h1 className="text-2xl font-semibold">Invoices</h1>
         <Link
           href="/invoices/new"
-          className="rounded bg-black px-3 py-2 text-sm text-white"
+          className="rounded bg-gray-900 px-3 py-2 text-sm text-gray-50"
         >
           New invoice
         </Link>

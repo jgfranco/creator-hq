@@ -23,7 +23,7 @@ export default function InvoicePage({ params }: PageProps<"/invoices/[id]">) {
     <div>
       <Link
         href="/invoices"
-        className="mb-4 inline-block text-sm text-gray-600 hover:text-black print:hidden"
+        className="mb-4 inline-block text-sm text-gray-600 hover:text-gray-950 print:hidden"
       >
         ← Invoices
       </Link>

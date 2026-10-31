@@ -55,7 +55,7 @@ async function NewInvoice({
     <>
       <p className="mb-6 text-sm text-gray-600">
         Billing{" "}
-        <span className="font-medium text-black">{campaign.brand.name}</span>{" "}
+        <span className="font-medium text-gray-950">{campaign.brand.name}</span>{" "}
         for{" "}
         <Link href={`/campaigns/${campaign.id}`} className="underline">
           {campaign.title}
@@ -133,7 +133,7 @@ async function ChooseCampaign() {
       </div>
       <button
         type="submit"
-        className="rounded bg-black px-4 py-2 text-sm text-white"
+        className="rounded bg-gray-900 px-4 py-2 text-sm text-gray-50"
       >
         Continue
       </button>
