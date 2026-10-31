@@ -39,6 +39,18 @@ export async function getCampaign(id: string) {
       endDate: true,
       createdAt: true,
       brand: { select: { id: true, name: true, archivedAt: true } },
+      invoices: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          number: true,
+          status: true,
+          currency: true,
+          dueDate: true,
+          totalCents: true,
+          payments: { select: { amountCents: true } },
+        },
+      },
       deliverables: {
         orderBy: [
           { dueDate: { sort: "asc", nulls: "last" } },

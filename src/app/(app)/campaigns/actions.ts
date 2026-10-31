@@ -140,9 +140,23 @@ export async function setCampaignStatus(id: string, formData: FormData) {
   revalidatePath("/dashboard");
 }
 
-export async function deleteCampaign(id: string) {
+export async function deleteCampaign(
+  id: string,
+): Promise<{ error?: string } | void> {
   const membership = await getCurrentMembership();
   requireRole(membership, ["OWNER", "MANAGER"]);
+
+  // Invoices are financial records, so a campaign that has any can't be deleted.
+  // The foreign key enforces this too; checking first gives a readable message.
+  const invoiceCount = await prisma.invoice.count({
+    where: { campaignId: id, workspaceId: membership.workspaceId },
+  });
+  if (invoiceCount > 0) {
+    return {
+      error:
+        "This campaign has invoices, so it can't be deleted. Cancel it instead.",
+    };
+  }
 
   // Deliverables are removed by the cascade on Deliverable.campaignId
   const { count } = await prisma.campaign.deleteMany({

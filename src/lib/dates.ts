@@ -21,3 +21,7 @@ export function formatDate(date: Date | null, locale = "en-US"): string {
 export function today(): Date {
   return parseDateInput(new Date().toISOString().slice(0, 10));
 }
+
+export function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+}
