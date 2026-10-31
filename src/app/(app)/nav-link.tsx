@@ -1,12 +1,28 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href || pathname.startsWith(`${href}/`);
+type NavLinkProps = { href: string; children: React.ReactNode };
 
+// usePathname suspends while prerendering dynamic routes (e.g. /brands/[id]),
+// so the static shell renders an inactive link and the highlight streams in.
+export function NavLink(props: NavLinkProps) {
+  return (
+    <Suspense fallback={<NavLinkView {...props} isActive={false} />}>
+      <ActiveNavLink {...props} />
+    </Suspense>
+  );
+}
+
+function ActiveNavLink(props: NavLinkProps) {
+  const pathname = usePathname();
+  const isActive = pathname === props.href || pathname.startsWith(`${props.href}/`);
+  return <NavLinkView {...props} isActive={isActive} />;
+}
+
+function NavLinkView({ href, children, isActive }: NavLinkProps & { isActive: boolean }) {
   return (
     <Link
       href={href}

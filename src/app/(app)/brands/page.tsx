@@ -56,7 +56,11 @@ async function BrandsView({
               const contact = brand.contacts[0];
               return (
                 <tr key={brand.id} className="border-b last:border-0">
-                  <td className="py-2 font-medium">{brand.name}</td>
+                  <td className="py-2 font-medium">
+                    <Link href={`/brands/${brand.id}`} className="hover:underline">
+                      {brand.name}
+                    </Link>
+                  </td>
                   <td className="py-2">
                     {brand.website ? (
                       <a

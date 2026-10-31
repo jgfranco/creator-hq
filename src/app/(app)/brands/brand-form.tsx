@@ -2,12 +2,22 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { createBrand, type BrandFormState } from "./actions";
+import type { BrandFormState } from "./actions";
 
-const initialState: BrandFormState = {};
+type BrandValues = NonNullable<BrandFormState["values"]>;
 
-export function BrandForm() {
-  const [state, formAction, pending] = useActionState(createBrand, initialState);
+export function BrandForm({
+  action,
+  defaultValues = { name: "", website: "", notes: "" },
+  submitLabel,
+  cancelHref,
+}: {
+  action: (state: BrandFormState, formData: FormData) => Promise<BrandFormState>;
+  defaultValues?: BrandValues;
+  submitLabel: string;
+  cancelHref: string;
+}) {
+  const [state, formAction, pending] = useActionState(action, { values: defaultValues });
 
   return (
     <form action={formAction} className="max-w-lg space-y-5">
@@ -62,9 +72,9 @@ export function BrandForm() {
           disabled={pending}
           className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
         >
-          {pending ? "Saving…" : "Create brand"}
+          {pending ? "Saving…" : submitLabel}
         </button>
-        <Link href="/brands" className="text-sm text-gray-600 hover:text-black">
+        <Link href={cancelHref} className="text-sm text-gray-600 hover:text-black">
           Cancel
         </Link>
       </div>
