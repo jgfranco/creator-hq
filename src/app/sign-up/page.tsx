@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { safeNextPath } from "@/lib/safe-redirect";
+import { AuthSwitchLink } from "../auth-switch-link";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -30,7 +31,9 @@ export default function SignUpPage() {
       return;
     }
 
-    router.push("/dashboard");
+    // Read at submit time so the page needs no useSearchParams Suspense boundary
+    const next = new URLSearchParams(window.location.search).get("next");
+    router.push(safeNextPath(next));
     router.refresh();
   }
 
@@ -90,9 +93,7 @@ export default function SignUpPage() {
 
       <p className="mt-4 text-sm">
         Already have an account?{" "}
-        <Link href="/sign-in" className="underline">
-          Sign in
-        </Link>
+        <AuthSwitchLink href="/sign-in">Sign in</AuthSwitchLink>
       </p>
     </main>
   );

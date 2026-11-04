@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getCurrentMembership } from "@/lib/workspace";
 import { NavLink } from "./nav-link";
 import { SignOutButton } from "./sign-out-button";
+import { WorkspaceSwitcher } from "./workspace-switcher";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,12 +18,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <NavLink href="/campaigns">Campaigns</NavLink>
               <NavLink href="/brands">Brands</NavLink>
               <NavLink href="/invoices">Invoices</NavLink>
+              <NavLink href="/settings">Settings</NavLink>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
             <Suspense fallback={null}>
-              <WorkspaceName />
+              <WorkspaceSwitcher />
             </Suspense>
             <SignOutButton />
           </div>
@@ -35,7 +36,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-async function WorkspaceName() {
-  const membership = await getCurrentMembership();
-  return <span className="text-sm text-gray-500">{membership.workspace.name}</span>;
-}
