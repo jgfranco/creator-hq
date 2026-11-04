@@ -24,6 +24,7 @@ model User {
   memberships Membership[]
   sessions    Session[]
   accounts    Account[]
+  invitations Invitation[]
 }
 
 model Workspace {
@@ -38,6 +39,7 @@ model Workspace {
   nextInvoiceNumber Int @default(1)
 
   memberships Membership[]
+  invitations Invitation[]
   brands      Brand[]
   campaigns   Campaign[]
   invoices    Invoice[]
@@ -62,6 +64,26 @@ model Membership {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+// A link an owner shares to add someone to the workspace. Only a hash of the
+// token is stored, so the database alone can't be used to accept invites.
+model Invitation {
+  id         String    @id @default(cuid())
+  email      String    @db.Citext
+  role       Role
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  invitedById String
+  invitedBy   User   @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
   @@index([workspaceId])
 }
 
