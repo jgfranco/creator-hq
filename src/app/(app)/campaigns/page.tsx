@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { FilterTab } from "../filter-tab";
+import { SearchForm } from "../search-form";
+import { listHref, parseSearch } from "@/lib/search";
 import { listCampaigns } from "@/lib/campaigns";
 import { getCurrentMembership } from "@/lib/workspace";
 import { formatEnum } from "@/lib/format";
@@ -37,26 +39,34 @@ async function CampaignsView({
 }: {
   searchParams: PageProps<"/campaigns">["searchParams"];
 }) {
-  const { status: statusParam } = await searchParams;
+  const { status: statusParam, q: qParam } = await searchParams;
+  const q = parseSearch(qParam);
   // Ignore unknown values rather than erroring on a hand-edited URL
   const status = Object.values(CampaignStatus).find((s) => s === statusParam);
 
   const [campaigns, membership] = await Promise.all([
-    listCampaigns({ status }),
+    listCampaigns({ status, q }),
     getCurrentMembership(),
   ]);
   const { currency } = membership.workspace;
 
   return (
     <>
+      <SearchForm
+        action="/campaigns"
+        q={q}
+        placeholder="Search campaigns or brands"
+        keep={{ status }}
+      />
+
       <div className="mb-4 flex flex-wrap gap-1 text-sm">
-        <FilterTab href="/campaigns" active={!status}>
+        <FilterTab href={listHref("/campaigns", { q })} active={!status}>
           All
         </FilterTab>
         {Object.values(CampaignStatus).map((s) => (
           <FilterTab
             key={s}
-            href={`/campaigns?status=${s}`}
+            href={listHref("/campaigns", { status: s, q })}
             active={status === s}
           >
             {formatEnum(s)}
@@ -66,9 +76,11 @@ async function CampaignsView({
 
       {campaigns.length === 0 ? (
         <p className="rounded border border-dashed p-6 text-center text-sm text-gray-500">
-          {status
-            ? `No ${formatEnum(status).toLowerCase()} campaigns.`
-            : "No campaigns yet. Create one to start tracking a brand deal."}
+          {q
+            ? `No ${status ? `${formatEnum(status).toLowerCase()} ` : ""}campaigns match “${q}”.`
+            : status
+              ? `No ${formatEnum(status).toLowerCase()} campaigns.`
+              : "No campaigns yet. Create one to start tracking a brand deal."}
         </p>
       ) : (
         <table className="w-full text-left text-sm">

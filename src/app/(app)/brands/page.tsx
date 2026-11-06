@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { FilterTab } from "../filter-tab";
+import { SearchForm } from "../search-form";
+import { listHref, parseSearch } from "@/lib/search";
 import { listBrands } from "@/lib/brands";
 
 export default function BrandsPage({ searchParams }: PageProps<"/brands">) {
@@ -25,20 +27,34 @@ async function BrandsView({
 }: {
   searchParams: PageProps<"/brands">["searchParams"];
 }) {
-  const { archived } = await searchParams;
+  const { archived, q: qParam } = await searchParams;
   const showArchived = archived === "1";
-  const brands = await listBrands({ archived: showArchived });
+  const q = parseSearch(qParam);
+  const brands = await listBrands({ archived: showArchived, q });
 
   return (
     <>
+      <SearchForm
+        action="/brands"
+        q={q}
+        placeholder="Search brands or contacts"
+        keep={{ archived: showArchived ? "1" : undefined }}
+      />
+
       <div className="mb-4 flex gap-1 text-sm">
-        <FilterTab href="/brands" active={!showArchived}>Active</FilterTab>
-        <FilterTab href="/brands?archived=1" active={showArchived}>Archived</FilterTab>
+        <FilterTab href={listHref("/brands", { q })} active={!showArchived}>
+          Active
+        </FilterTab>
+        <FilterTab href={listHref("/brands", { archived: "1", q })} active={showArchived}>
+          Archived
+        </FilterTab>
       </div>
 
       {brands.length === 0 ? (
         <p className="rounded border border-dashed p-6 text-center text-sm text-gray-500">
-          {showArchived
+          {q
+            ? `No ${showArchived ? "archived " : ""}brands match “${q}”.`
+            : showArchived
             ? "No archived brands."
             : "No brands yet. Add the companies you work with to start tracking deals."}
         </p>
