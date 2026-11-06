@@ -2,14 +2,34 @@ import "server-only";
 import { notFound } from "next/navigation";
 import { prisma } from "./db";
 import { getCurrentMembership } from "./workspace";
+import { likeEscape } from "./search";
 
-export async function listBrands({ archived = false }: { archived?: boolean } = {}) {
+export async function listBrands({
+  archived = false,
+  q,
+}: { archived?: boolean; q?: string } = {}) {
   const { workspaceId } = await getCurrentMembership();
 
   return prisma.brand.findMany({
     where: {
       workspaceId,
       archivedAt: archived ? { not: null } : null,
+      // Name, or any contact's name or email
+      ...(q && {
+        OR: [
+          { name: { contains: likeEscape(q), mode: "insensitive" } },
+          {
+            contacts: {
+              some: {
+                OR: [
+                  { name: { contains: likeEscape(q), mode: "insensitive" } },
+                  { email: { contains: likeEscape(q), mode: "insensitive" } },
+                ],
+              },
+            },
+          },
+        ],
+      }),
     },
     orderBy: { name: "asc" },
     select: {

@@ -7,10 +7,12 @@ import {
   type InvoiceFilter,
 } from "@/lib/invoices";
 import { formatInvoiceNumber, isOverdue } from "@/lib/invoice-rules";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyTotals } from "@/lib/money";
 import { formatDate, today } from "@/lib/dates";
 import { formatEnum } from "@/lib/format";
 import { FilterTab } from "../filter-tab";
+import { SearchForm } from "../search-form";
+import { listHref, parseSearch } from "@/lib/search";
 import { InvoiceStatusBadge } from "./status-badge";
 
 export default function InvoicesPage({ searchParams }: PageProps<"/invoices">) {
@@ -35,30 +37,19 @@ export default function InvoicesPage({ searchParams }: PageProps<"/invoices">) {
   );
 }
 
-// Totals per currency, e.g. "$1,200.00 + €300.00" (invoices keep their own currency)
-function formatTotals(amounts: { cents: number; currency: string }[]) {
-  const byCurrency = new Map<string, number>();
-  for (const { cents, currency } of amounts) {
-    byCurrency.set(currency, (byCurrency.get(currency) ?? 0) + cents);
-  }
-  if (byCurrency.size === 0) return formatMoney(0, "USD");
-  return [...byCurrency]
-    .map(([currency, cents]) => formatMoney(cents, currency))
-    .join(" + ");
-}
-
 async function InvoicesView({
   searchParams,
 }: {
   searchParams: PageProps<"/invoices">["searchParams"];
 }) {
-  const { filter: filterParam } = await searchParams;
+  const { filter: filterParam, q: qParam } = await searchParams;
+  const q = parseSearch(qParam);
   const filter: InvoiceFilter =
     INVOICE_FILTERS.find((f) => f === filterParam) ?? "all";
 
   // The summary always covers all outstanding invoices, whatever the filter
   const [invoices, outstanding] = await Promise.all([
-    listInvoices({ filter }),
+    listInvoices({ filter, q }),
     listInvoices({ filter: "outstanding" }),
   ]);
 
@@ -75,7 +66,7 @@ async function InvoicesView({
         <div className="rounded border p-3">
           <dt className="text-gray-500">Outstanding</dt>
           <dd className="mt-1 text-lg font-semibold tabular-nums">
-            {formatTotals(outstanding.map(balanceOf))}
+            {formatMoneyTotals(outstanding.map(balanceOf))}
           </dd>
         </div>
         <div className="rounded border p-3">
@@ -83,16 +74,26 @@ async function InvoicesView({
           <dd
             className={`mt-1 text-lg font-semibold tabular-nums ${overdue.length ? "text-red-700" : ""}`}
           >
-            {formatTotals(overdue.map(balanceOf))}
+            {formatMoneyTotals(overdue.map(balanceOf))}
           </dd>
         </div>
       </dl>
+
+      <SearchForm
+        action="/invoices"
+        q={q}
+        placeholder="Search by number, brand or campaign"
+        keep={{ filter: filter === "all" ? undefined : filter }}
+      />
 
       <div className="mb-4 flex flex-wrap gap-1 text-sm">
         {INVOICE_FILTERS.map((f) => (
           <FilterTab
             key={f}
-            href={f === "all" ? "/invoices" : `/invoices?filter=${f}`}
+            href={listHref("/invoices", {
+              filter: f === "all" ? undefined : f,
+              q,
+            })}
             active={filter === f}
           >
             {formatEnum(f)}
@@ -102,9 +103,11 @@ async function InvoicesView({
 
       {invoices.length === 0 ? (
         <p className="rounded border border-dashed p-6 text-center text-sm text-gray-500">
-          {filter === "all"
-            ? "No invoices yet. Create one from a campaign to bill the brand."
-            : `No ${filter} invoices.`}
+          {q
+            ? `No ${filter === "all" ? "" : `${filter} `}invoices match “${q}”.`
+            : filter === "all"
+              ? "No invoices yet. Create one from a campaign to bill the brand."
+              : `No ${filter} invoices.`}
         </p>
       ) : (
         <table className="w-full text-left text-sm">

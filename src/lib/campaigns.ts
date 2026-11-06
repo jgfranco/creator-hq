@@ -2,15 +2,26 @@ import "server-only";
 import { notFound } from "next/navigation";
 import { prisma } from "./db";
 import { getCurrentMembership } from "./workspace";
+import { likeEscape } from "./search";
 import type { CampaignStatus } from "@/generated/prisma/enums";
 
 export async function listCampaigns({
   status,
-}: { status?: CampaignStatus } = {}) {
+  q,
+}: { status?: CampaignStatus; q?: string } = {}) {
   const { workspaceId } = await getCurrentMembership();
 
   return prisma.campaign.findMany({
-    where: { workspaceId, status },
+    where: {
+      workspaceId,
+      status,
+      ...(q && {
+        OR: [
+          { title: { contains: likeEscape(q), mode: "insensitive" } },
+          { brand: { name: { contains: likeEscape(q), mode: "insensitive" } } },
+        ],
+      }),
+    },
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
     select: {
       id: true,

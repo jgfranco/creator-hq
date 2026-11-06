@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "./db";
 import { getCurrentMembership } from "./workspace";
 import { today } from "./dates";
+import { invoiceNumberFromSearch, likeEscape } from "./search";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const INVOICE_FILTERS = [
@@ -39,13 +40,30 @@ export function sumPayments(payments: { amountCents: number }[]): number {
   return payments.reduce((sum, payment) => sum + payment.amountCents, 0);
 }
 
+// Campaign title, brand name, or invoice number ("INV-0042", "42")
+function searchWhere(q: string): Prisma.InvoiceWhereInput {
+  const number = invoiceNumberFromSearch(q);
+  return {
+    OR: [
+      { campaign: { title: { contains: likeEscape(q), mode: "insensitive" } } },
+      {
+        campaign: {
+          brand: { name: { contains: likeEscape(q), mode: "insensitive" } },
+        },
+      },
+      ...(number !== undefined ? [{ number }] : []),
+    ],
+  };
+}
+
 export async function listInvoices({
   filter = "all",
-}: { filter?: InvoiceFilter } = {}) {
+  q,
+}: { filter?: InvoiceFilter; q?: string } = {}) {
   const { workspaceId } = await getCurrentMembership();
 
   return prisma.invoice.findMany({
-    where: { workspaceId, ...filterWhere(filter) },
+    where: { workspaceId, ...filterWhere(filter), ...(q && searchWhere(q)) },
     // Drafts (no number) first, then newest numbers first
     orderBy: [
       { number: { sort: "desc", nulls: "first" } },

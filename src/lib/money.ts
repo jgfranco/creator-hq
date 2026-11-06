@@ -48,3 +48,19 @@ export function toMoneyInput(
   const fractionDigits = fractionDigitsFor(currency);
   return (amountInMinorUnits / 10 ** fractionDigits).toFixed(fractionDigits);
 }
+
+// Sums amounts per currency, e.g. "$1,200.00 + €300.00" (invoices keep their own
+// currency, so totals across currencies can't be added up)
+export function formatMoneyTotals(
+  amounts: { cents: number; currency: string }[],
+  fallbackCurrency = "USD",
+): string {
+  const byCurrency = new Map<string, number>();
+  for (const { cents, currency } of amounts) {
+    byCurrency.set(currency, (byCurrency.get(currency) ?? 0) + cents);
+  }
+  if (byCurrency.size === 0) return formatMoney(0, fallbackCurrency);
+  return [...byCurrency]
+    .map(([currency, cents]) => formatMoney(cents, currency))
+    .join(" + ");
+}
