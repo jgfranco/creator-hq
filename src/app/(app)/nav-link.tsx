@@ -18,11 +18,16 @@ export function NavLink(props: NavLinkProps) {
 
 function ActiveNavLink(props: NavLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === props.href || pathname.startsWith(`${props.href}/`);
+  const isActive =
+    pathname === props.href || pathname.startsWith(`${props.href}/`);
   return <NavLinkView {...props} isActive={isActive} />;
 }
 
-function NavLinkView({ href, children, isActive }: NavLinkProps & { isActive: boolean }) {
+function NavLinkView({
+  href,
+  children,
+  isActive,
+}: NavLinkProps & { isActive: boolean }) {
   return (
     <Link
       href={href}

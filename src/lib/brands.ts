@@ -59,7 +59,13 @@ export async function getBrand(id: string) {
       archivedAt: true,
       contacts: {
         orderBy: [{ isPrimary: "desc" }, { name: "asc" }],
-        select: { id: true, name: true, email: true, title: true, isPrimary: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          title: true,
+          isPrimary: true,
+        },
       },
       campaigns: {
         orderBy: { createdAt: "desc" },
@@ -74,7 +80,9 @@ export async function getBrand(id: string) {
 
 // Brands a campaign can be assigned to: active ones, plus the campaign's current
 // brand when editing (so an archived brand doesn't silently drop out of the select).
-export async function listBrandOptions({ includeId }: { includeId?: string } = {}) {
+export async function listBrandOptions({
+  includeId,
+}: { includeId?: string } = {}) {
   const { workspaceId } = await getCurrentMembership();
 
   return prisma.brand.findMany({

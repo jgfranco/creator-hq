@@ -4,7 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getCurrentMembership, requireRole, ForbiddenError } from "@/lib/workspace";
+import {
+  getCurrentMembership,
+  requireRole,
+  ForbiddenError,
+} from "@/lib/workspace";
 import { brandSchema, type BrandInput } from "@/lib/validation/brand";
 import { Prisma } from "@/generated/prisma/client";
 
@@ -30,13 +34,17 @@ async function prepareBrandWrite(formData: FormData): Promise<BrandWrite> {
   try {
     requireRole(membership, ["OWNER", "MANAGER"]);
   } catch (error) {
-    if (error instanceof ForbiddenError) return { ok: false, state: { message: error.message, values } };
+    if (error instanceof ForbiddenError)
+      return { ok: false, state: { message: error.message, values } };
     throw error;
   }
 
   const parsed = brandSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false, state: { fieldErrors: z.flattenError(parsed.error).fieldErrors, values } };
+    return {
+      ok: false,
+      state: { fieldErrors: z.flattenError(parsed.error).fieldErrors, values },
+    };
   }
 
   return { ok: true, workspaceId: membership.workspaceId, data: parsed.data };
@@ -49,7 +57,10 @@ async function duplicateNameState(
   name: string,
   formData: FormData,
 ): Promise<BrandFormState> {
-  if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")) {
+  if (!(
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  )) {
     throw error;
   }
 
@@ -85,7 +96,12 @@ export async function createBrand(
       select: { id: true },
     }));
   } catch (error) {
-    return duplicateNameState(error, write.workspaceId, write.data.name, formData);
+    return duplicateNameState(
+      error,
+      write.workspaceId,
+      write.data.name,
+      formData,
+    );
   }
 
   revalidatePath("/brands");
@@ -108,7 +124,12 @@ export async function updateBrand(
     });
     if (count === 0) notFound();
   } catch (error) {
-    return duplicateNameState(error, write.workspaceId, write.data.name, formData);
+    return duplicateNameState(
+      error,
+      write.workspaceId,
+      write.data.name,
+      formData,
+    );
   }
 
   revalidatePath("/brands");
