@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
-export function SignOutButton({ redirectTo = "/sign-in" }: { redirectTo?: string }) {
+export function SignOutButton({
+  redirectTo = "/sign-in",
+}: {
+  redirectTo?: string;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 

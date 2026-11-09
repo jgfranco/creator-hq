@@ -10,12 +10,17 @@ export default function BrandsPage({ searchParams }: PageProps<"/brands">) {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Brands</h1>
-        <Link href="/brands/new" className="rounded bg-gray-900 px-3 py-2 text-sm text-gray-50">
+        <Link
+          href="/brands/new"
+          className="rounded bg-gray-900 px-3 py-2 text-sm text-gray-50"
+        >
           New brand
         </Link>
       </div>
 
-      <Suspense fallback={<p className="text-sm text-gray-500">Loading brands…</p>}>
+      <Suspense
+        fallback={<p className="text-sm text-gray-500">Loading brands…</p>}
+      >
         <BrandsView searchParams={searchParams} />
       </Suspense>
     </div>
@@ -45,7 +50,10 @@ async function BrandsView({
         <FilterTab href={listHref("/brands", { q })} active={!showArchived}>
           Active
         </FilterTab>
-        <FilterTab href={listHref("/brands", { archived: "1", q })} active={showArchived}>
+        <FilterTab
+          href={listHref("/brands", { archived: "1", q })}
+          active={showArchived}
+        >
           Archived
         </FilterTab>
       </div>
@@ -55,8 +63,8 @@ async function BrandsView({
           {q
             ? `No ${showArchived ? "archived " : ""}brands match “${q}”.`
             : showArchived
-            ? "No archived brands."
-            : "No brands yet. Add the companies you work with to start tracking deals."}
+              ? "No archived brands."
+              : "No brands yet. Add the companies you work with to start tracking deals."}
         </p>
       ) : (
         <table className="w-full text-left text-sm">
@@ -74,7 +82,10 @@ async function BrandsView({
               return (
                 <tr key={brand.id} className="border-b last:border-0">
                   <td className="py-2 font-medium">
-                    <Link href={`/brands/${brand.id}`} className="hover:underline">
+                    <Link
+                      href={`/brands/${brand.id}`}
+                      className="hover:underline"
+                    >
                       {brand.name}
                     </Link>
                   </td>
@@ -97,14 +108,18 @@ async function BrandsView({
                       <>
                         {contact.name}
                         {contact.email && (
-                          <span className="block text-xs text-gray-500">{contact.email}</span>
+                          <span className="block text-xs text-gray-500">
+                            {contact.email}
+                          </span>
                         )}
                       </>
                     ) : (
                       "—"
                     )}
                   </td>
-                  <td className="py-2 text-right tabular-nums">{brand._count.campaigns}</td>
+                  <td className="py-2 text-right tabular-nums">
+                    {brand._count.campaigns}
+                  </td>
                 </tr>
               );
             })}

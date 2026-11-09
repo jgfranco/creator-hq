@@ -13,17 +13,25 @@ export function BrandForm({
   submitLabel,
   cancelHref,
 }: {
-  action: (state: BrandFormState, formData: FormData) => Promise<BrandFormState>;
+  action: (
+    state: BrandFormState,
+    formData: FormData,
+  ) => Promise<BrandFormState>;
   defaultValues?: BrandValues;
   submitLabel: string;
   cancelHref: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, { values: defaultValues });
+  const [state, formAction, pending] = useActionState(action, {
+    values: defaultValues,
+  });
 
   return (
     <form action={formAction} className="max-w-lg space-y-5">
       {state.message && (
-        <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
           {state.message}
         </p>
       )}
@@ -41,7 +49,12 @@ export function BrandForm({
         />
       </Field>
 
-      <Field label="Website" name="website" hint="Optional" errors={state.fieldErrors?.website}>
+      <Field
+        label="Website"
+        name="website"
+        hint="Optional"
+        errors={state.fieldErrors?.website}
+      >
         <input
           id="website"
           name="website"
@@ -49,12 +62,19 @@ export function BrandForm({
           placeholder="https://"
           defaultValue={state.values?.website}
           aria-invalid={!!state.fieldErrors?.website}
-          aria-describedby={state.fieldErrors?.website ? "website-error" : undefined}
+          aria-describedby={
+            state.fieldErrors?.website ? "website-error" : undefined
+          }
           className="w-full rounded border px-3 py-2"
         />
       </Field>
 
-      <Field label="Notes" name="notes" hint="Optional" errors={state.fieldErrors?.notes}>
+      <Field
+        label="Notes"
+        name="notes"
+        hint="Optional"
+        errors={state.fieldErrors?.notes}
+      >
         <textarea
           id="notes"
           name="notes"
@@ -62,7 +82,9 @@ export function BrandForm({
           maxLength={2000}
           defaultValue={state.values?.notes}
           aria-invalid={!!state.fieldErrors?.notes}
-          aria-describedby={state.fieldErrors?.notes ? "notes-error" : undefined}
+          aria-describedby={
+            state.fieldErrors?.notes ? "notes-error" : undefined
+          }
           className="w-full rounded border px-3 py-2"
         />
       </Field>
@@ -75,7 +97,10 @@ export function BrandForm({
         >
           {pending ? "Saving…" : submitLabel}
         </button>
-        <Link href={cancelHref} className="text-sm text-gray-600 hover:text-gray-950">
+        <Link
+          href={cancelHref}
+          className="text-sm text-gray-600 hover:text-gray-950"
+        >
           Cancel
         </Link>
       </div>
