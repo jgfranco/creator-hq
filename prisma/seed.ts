@@ -19,8 +19,10 @@ async function main() {
       body: { email: DEMO_EMAIL, password: demoPassword, name: "Demo Creator" },
     });
   }
-  const user = await prisma.user.findUniqueOrThrow({
+  // The demo address can't receive mail, so mark it verified directly
+  const user = await prisma.user.update({
     where: { email: DEMO_EMAIL },
+    data: { emailVerified: true },
   });
   console.log(`✔ User: ${user.email} (${user.id})`);
 

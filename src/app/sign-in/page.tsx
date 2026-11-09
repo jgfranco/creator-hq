@@ -1,87 +1,18 @@
-"use client";
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import { RedirectIfSignedIn } from "../redirect-if-signed-in";
+import { SignInForm } from "./sign-in-form";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-import { safeNextPath } from "@/lib/safe-redirect";
-import { AuthSwitchLink } from "../auth-switch-link";
+export const metadata: Metadata = { title: "Sign in" };
 
-export default function SignInPage() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    setPending(true);
-
-    const form = new FormData(event.currentTarget);
-
-    const { error } = await authClient.signIn.email({
-      email: String(form.get("email")),
-      password: String(form.get("password")),
-    });
-
-    setPending(false);
-
-    if (error) {
-      setError(error.message ?? "Invalid email or password");
-      return;
-    }
-
-    // Read at submit time so the page needs no useSearchParams Suspense boundary
-    const next = new URLSearchParams(window.location.search).get("next");
-    router.push(safeNextPath(next));
-    router.refresh();
-  }
-
+export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
   return (
     <main className="mx-auto mt-24 max-w-sm px-4">
+      <Suspense fallback={null}>
+        <RedirectIfSignedIn searchParams={searchParams} />
+      </Suspense>
       <h1 className="mb-6 text-2xl font-semibold">Sign in to your account</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block">
-          <span className="text-sm">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-
-        <label className="block">
-          <span className="text-sm">Password</span>
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-
-        {error && (
-          <p role="alert" className="text-sm text-red-600">
-            {error}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full rounded bg-gray-900 px-3 py-2 text-gray-50 disabled:opacity-50"
-        >
-          {pending ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
-
-      <p className="mt-4 text-sm">
-        Don&apos;t have an account?{" "}
-        <AuthSwitchLink href="/sign-up">Sign up</AuthSwitchLink>
-      </p>
+      <SignInForm />
     </main>
   );
 }

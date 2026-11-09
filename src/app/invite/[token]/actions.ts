@@ -10,6 +10,10 @@ export async function acceptInvitation(
   token: string,
 ): Promise<{ error?: string } | void> {
   const session = await requireSession();
+  // The email check below only means something once the address is proven
+  if (!session.user.emailVerified) {
+    return { error: "Verify your email address before accepting invites." };
+  }
   const tokenHash = hashInviteToken(token);
 
   const outcome = await prisma.$transaction(
