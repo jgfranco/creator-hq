@@ -5,6 +5,7 @@ import { getInvitationByToken } from "@/lib/members";
 import { formatEnum } from "@/lib/format";
 import { ActionButton } from "@/app/(app)/action-button";
 import { SignOutButton } from "@/app/(app)/sign-out-button";
+import { ResendVerificationButton } from "@/app/resend-verification-button";
 import { acceptInvitation } from "./actions";
 
 export default function InvitePage({ params }: PageProps<"/invite/[token]">) {
@@ -83,6 +84,17 @@ async function Invite({
           >
             Create an account
           </Link>
+        </div>
+      ) : emailMatches && !session.user.emailVerified ? (
+        <div className="space-y-2 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <p>
+            Verify your email address to accept this invite. We sent a link to{" "}
+            {session.user.email}; it brings you back here.
+          </p>
+          <ResendVerificationButton
+            email={session.user.email}
+            callbackURL={here}
+          />
         </div>
       ) : emailMatches ? (
         <ActionButton

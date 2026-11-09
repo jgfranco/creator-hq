@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NavLink } from "./nav-link";
 import { SignOutButton } from "./sign-out-button";
 import { WorkspaceSwitcher } from "./workspace-switcher";
+import { VerifyEmailBanner } from "./verify-email-banner";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,9 +31,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+      <Suspense fallback={null}>
+        <VerifyEmailBanner />
+      </Suspense>
 
       <main className="mx-auto max-w-5xl px-4 py-10">{children}</main>
     </div>
   );
 }
-
